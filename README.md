@@ -1,1 +1,1 @@
-# qmkPhilipsHueControler
+# qmk Philips Hue Controler
