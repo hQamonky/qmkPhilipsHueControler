@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+ <title>QMK Philips Hue Controler</title>
+</head>
+
+<body>
+  <h1>Step 1 - Choose Hue Bridge</h1>
+  <p>
+      Copy the ip address of the Hue Brige you want to add from the list above, past it in the field bellow and click next.
+      <!-- TODO : make a radio button list instead of asking to copy/past the ip address -->
+  </p>
+  <!-- Table that displays the list of bridges -->
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>IP Address</th>
+    </tr>
+  </table>
+  <br/>
+
+  <!-- The form that will be used to POST the ip address and go to step 2 -->
+   <form action="/step1" method="post">
+        Bridge IP address:
+        <input type="text" name="ip_address">
+        <input type="submit" value="Next">
+    </form>
+
+  <!-- The script that will run to fetch the list of bridges and add them to our existing table -->
+  <script>
+    bridgeTable = document.querySelector("table")
+    // Use the browsers `fetch` API to make a GET call to /step1
+    fetch("/step1")
+      .then(response => response.json())
+      .then(bridgeList => {
+        bridgeList.forEach(bridge => {
+          // Create the table row
+          row = document.createElement("tr")
+          // Create the table data elements for the id and ip columns
+          id = document.createElement("td")
+          id.innerHTML = bridge.id
+          internalipaddress = document.createElement("td")
+          internalipaddress.innerHTML = bridge.internalipaddress
+          // Add the data elements to the row
+          row.appendChild(id)
+          row.appendChild(internalipaddress)
+          // Add the row element to the table itself
+          bridgeTable.appendChild(row)
+        })
+      })
+  </script>
+</body>
