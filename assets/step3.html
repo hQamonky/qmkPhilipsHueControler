@@ -6,23 +6,19 @@
 </head>
 
 <body>
-  <h1>Step 2 - Validation</h1>
+  <h1>Step 3 - Success</h1>
+  <p>
+    Hue Bridge has successfully been added !
+  </p>
   <p id="bridgeInfo">
   </p>
-  <form action="/step2" method="post"> 
-    <p>
-      For this step you will have to interact phisically with your Hue bridge.<br/>
-      Press the big button on top of your bridge and click "Next".
-    </p>
-    <!-- The form that will be used to POST the ip address and go to step 2 -->
-    <input type="submit" value="Next">
-  </form>
-  
+  <p>[<a href="/connect/">Done</a>]</p>
+
   <!-- The script that will run to fetch the list of bridges and add them to our existing table -->
   <script>
       bridgeInfo = document.getElementById("bridgeInfo")
       // Use the browsers `fetch` API to make a GET call to /step1
-      fetch("/step2")
+      fetch("/step3")
         .then(response => response.json())
         .then(chosenBridge => {
           bridgeInfo.innerHTML = "Selected Hue Bridge :<br/>" +
