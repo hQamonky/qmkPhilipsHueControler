@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+ <title>QMK Philips Hue Controler</title>
+</head>
+
+<body>
+    <h1>Step 1 - Choose Hue Bridge</h1>
+    <p>
+        Copy the ip address of the Hue Brige you want to add from the list above, past it in the field bellow and click next.
+        <!-- TODO : make a radio button list instead of asking to copy/past the ip address -->
+    </p>
+
+    <!-- The form that will be used to POST the ip address and go to step 2 -->
+    <form action="/api/connect/step1" method="post">
+        <!-- Table that displays the list of bridges -->
+        <table>
+            <tr>
+                <th></th>
+                <th>ID</th>
+                <th>IP Address</th>
+            </tr>
+        </table>
+        <br/>
+        <input type="submit" value="Next">
+    </form>
+    <p>
+        [<a href="/connect/">Cancel</a>]
+    </p>
+
+  <!-- The script that will run to fetch the list of bridges and add them to our existing table -->
+  <script>
+    bridgeTable = document.querySelector("table")
+    // Use the browsers `fetch` API to make a GET call to /step1
+    fetch("/api/connect/step1")
+      .then(response => response.json())
+      .then(bridgeList => {
+        bridgeList.forEach(bridge => {
+          // Create the table row
+          row = document.createElement("tr")
+          // Create the table data elements for the id and ip columns
+          radio = document.createElement("td")
+          radio.innerHTML = "<input type=\"radio\" name=\"bridge\" value=\"" + bridge.id + "\">"
+          id = document.createElement("td")
+          id.innerHTML = bridge.id
+          internalipaddress = document.createElement("td")
+          internalipaddress.innerHTML = bridge.internalipaddress
+          // Add the data elements to the row
+          row.appendChild(radio)
+          row.appendChild(id)
+          row.appendChild(internalipaddress)
+          // Add the row element to the table itself
+          bridgeTable.appendChild(row)
+        })
+      })
+  </script>
+</body>

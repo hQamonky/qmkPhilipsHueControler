@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+ <title>QMK Philips Hue Controler</title>
+</head>
+
+<body>
+    <p>[<a href="/connect/step1.html">Add Philips Hue Bridge</a>]</p>
+    <p>
+        Your Hue Bridges :<br/>
+        <!-- Table that displays the list of bridges -->
+        <table>
+            <tr>
+                <th></th>
+                <th>ID</th>
+                <th>IP Address</th>
+                <th>Username</th>
+            </tr>
+        </table>
+    </p>
+    
+  <!-- The script that will run to fetch the list of bridges and add them to our existing table -->
+  <script>
+        bridgeTable = document.querySelector("table")
+        // Use the browsers `fetch` API to make a GET call to /step1
+        fetch("/api/connect/bridges")
+          .then(response => response.json())
+          .then(bridgeList => {
+            bridgeList.forEach(bridge => {
+              // Create the table row
+              row = document.createElement("tr")
+              // Create the table data elements for the id and ip columns
+              rm = document.createElement("td")
+              rm.innerHTML = "[<a href=\"/api/connect/remove/" + bridge.username + "\">Remove</a>]"
+              id = document.createElement("td")
+              id.innerHTML = bridge.id
+              internalipaddress = document.createElement("td")
+              internalipaddress.innerHTML = bridge.internalipaddress
+              username = document.createElement("td")
+              username.innerHTML = bridge.username
+              // Add the data elements to the row
+              row.appendChild(rm)
+              row.appendChild(id)
+              row.appendChild(internalipaddress)
+              row.appendChild(username)
+              // Add the row element to the table itself
+              bridgeTable.appendChild(row)
+            })
+          })
+      </script>
+</body>
