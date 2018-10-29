@@ -13,11 +13,11 @@ import (
 type Bridge struct {
 	ID                string `json:"id"`
 	InternalIPAddress string `json:"internalipaddress"`
+	Username          string `json:"username"`
 }
 
 var bridges []Bridge
 var chosenBridge Bridge
-var username string
 
 var myClient = &http.Client{Timeout: 10 * time.Second}
 
@@ -143,19 +143,19 @@ func postStep2(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("error description:", description)
 		// TODO : Display error in popup
 	} else if jObj["success"] != nil {
-		username = jObj["success"].(map[string]interface{})["username"].(string)
-		fmt.Println("username:", username)
+		chosenBridge.Username = jObj["success"].(map[string]interface{})["username"].(string)
+		fmt.Println("username:", chosenBridge.Username)
 
 		//Redirect the user to the to the next step
 		http.Redirect(w, r, "/connect/step3.html", http.StatusFound)
 	}
 }
 
-// Handles loading of page "step2.html"
+// Handles loading of page "step3.html"
 func getStep3(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Executing getStep3 function...")
 
-	//Convert the bridge variable to json
+	// Convert the bridge variable to json
 	bridgeBytes, err := json.Marshal(chosenBridge)
 	// Handle errors
 	if err != nil {
@@ -166,6 +166,45 @@ func getStep3(w http.ResponseWriter, r *http.Request) {
 	// Write the JSON chosen bridge to the response
 	w.Write(bridgeBytes)
 
-	// TODO : Store username in database
-	fmt.Println("Storing username :", username)
+	// Store username in database
+	fmt.Println("Storing username :", chosenBridge.Username)
+	fmt.Println("Storing bridge :", chosenBridge)
+	err = store.CreateBridge(&chosenBridge)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+// Handles loading of page "step1.html"
+func getBridges(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Executing getBridges function...")
+	// // Discover Hue Bridges
+	// html, err := getHTML("https://discovery.meethue.com/")
+	// if err != nil {
+	// 	fmt.Println(fmt.Errorf("Error: %v", err))
+	// }
+	// // Unmarshal string into structs
+	// json.Unmarshal(html, &bridges)
+
+	// //Convert the "bridges" variable to json
+	// bridgeListBytes, err := json.Marshal(bridges)
+
+	// New line
+	bridges, err := store.GetBridges()
+	// Handle errors
+	if err != nil {
+		fmt.Println(fmt.Errorf("Error: %v", err))
+		return
+	}
+
+	// Convert the bridge variable to json
+	bridgeListBytes, err := json.Marshal(bridges)
+	// Handle errors
+	if err != nil {
+		fmt.Println(fmt.Errorf("Error: %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	// Write the JSON list of bridges to the response
+	w.Write(bridgeListBytes)
 }

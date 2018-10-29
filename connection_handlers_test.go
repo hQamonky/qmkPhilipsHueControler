@@ -19,3 +19,11 @@ func TestGetStep2(t *testing.T) {
 func TestPostStep2(t *testing.T) {
 	// TODO
 }
+
+func TestGetStep3(t *testing.T) {
+	// TODO
+}
+
+func TestGetBridges(t *testing.T) {
+	// TODO
+}

@@ -1,9 +1,11 @@
 package main
 
 import (
+	"database/sql"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/gorilla/mux" // The libn/pq driver is used for postgres
+	_ "github.com/lib/pq"
 )
 
 // newRouter creates the router and returns it
@@ -30,15 +32,31 @@ func newRouter() *mux.Router {
 	// connectRouter.HandleFunc("/step1", step1Handler)
 	//
 
+	r.HandleFunc("/bridges", getBridges).Methods("GET")
 	r.HandleFunc("/step1", getStep1).Methods("GET")
 	r.HandleFunc("/step1", postStep1).Methods("POST")
 	r.HandleFunc("/step2", getStep2).Methods("GET")
 	r.HandleFunc("/step2", postStep2).Methods("POST")
-	r.HandleFunc("/step3", getStep2).Methods("GET")
+	r.HandleFunc("/step3", getStep3).Methods("GET")
 	return r
 }
 
 func main() {
+	// Connect to the database
+	connString := "host=localhost port=5432 user=postgres password=qmk dbname=qmkPhilipsHueController sslmode=disable"
+	db, err := sql.Open("postgres", connString)
+
+	if err != nil {
+		panic(err)
+	}
+	err = db.Ping()
+
+	if err != nil {
+		panic(err)
+	}
+	// Initialize the store
+	InitStore(&dbStore{db: db})
+
 	// Create a new router
 	r := newRouter()
 	// Run the web server
