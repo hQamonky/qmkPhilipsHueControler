@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+ <title>QMK Philips Hue Controler</title>
+</head>
+
+<body>
+  <h1>Step 2 - Validation</h1>
+  <p id="bridgeInfo">
+  </p>
+  <form action="/api/connect/step2" method="post"> 
+    <p>
+      For this step you will have to interact phisically with your Hue bridge.<br/>
+      Press the big button on top of your bridge and click "Next".
+    </p>
+    <!-- The form that will be used to POST the ip address and go to step 2 -->
+    <input type="submit" value="Next">
+  </form>
+  <p>
+      [<a href="/connect/">Cancel</a>]
+  </p>
+  
+  <!-- The script that will run to fetch the list of bridges and add them to our existing table -->
+  <script>
+      bridgeInfo = document.getElementById("bridgeInfo")
+      // Use the browsers `fetch` API to make a GET call to /step1
+      fetch("/api/connect/step2")
+        .then(response => response.json())
+        .then(chosenBridge => {
+          bridgeInfo.innerHTML = "Selected Hue Bridge :<br/>" +
+          "ID : " + chosenBridge.id + "<br/>" + 
+          "IP : " + chosenBridge.internalipaddress
+        })
+    </script>
+</body>

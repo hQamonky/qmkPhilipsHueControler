@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 // Bridge is a json object that contains information about a Hue Bridge
@@ -40,6 +42,7 @@ func getHTML(url string) ([]byte, error) {
 // TODO : put file in a "connection" folder
 // Handles loading of page "step1.html"
 func getStep1(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Executing getStep1 function...")
 	// Discover Hue Bridges
 	html, err := getHTML("https://discovery.meethue.com/")
 	if err != nil {
@@ -71,7 +74,7 @@ func postStep1(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get the information about the bird from the form info
+	// Get the information about the bridge from the form info
 	fmt.Println("Selected bridge : ", r.Form.Get("bridge"))
 	chosenBridge.ID = r.Form.Get("bridge")
 	chosenBridge.InternalIPAddress = ""
@@ -175,21 +178,9 @@ func getStep3(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Handles loading of page "step1.html"
+// Handles loading of page "index.html"
 func getBridges(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Executing getBridges function...")
-	// // Discover Hue Bridges
-	// html, err := getHTML("https://discovery.meethue.com/")
-	// if err != nil {
-	// 	fmt.Println(fmt.Errorf("Error: %v", err))
-	// }
-	// // Unmarshal string into structs
-	// json.Unmarshal(html, &bridges)
-
-	// //Convert the "bridges" variable to json
-	// bridgeListBytes, err := json.Marshal(bridges)
-
-	// New line
 	bridges, err := store.GetBridges()
 	// Handle errors
 	if err != nil {
@@ -207,4 +198,21 @@ func getBridges(w http.ResponseWriter, r *http.Request) {
 	}
 	// Write the JSON list of bridges to the response
 	w.Write(bridgeListBytes)
+}
+
+// Removes a bidge from connections table, from the index.html page
+func removeBridge(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Executing removeBridge function...")
+	vars := mux.Vars(r)
+	username := vars["username"]
+
+	fmt.Println("Bridge to remove :", username)
+
+	err := store.DeleteBridge(username)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Refresh the page
+	http.Redirect(w, r, "/connect/", http.StatusFound)
 }

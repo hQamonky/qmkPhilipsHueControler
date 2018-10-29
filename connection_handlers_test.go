@@ -27,3 +27,7 @@ func TestGetStep3(t *testing.T) {
 func TestGetBridges(t *testing.T) {
 	// TODO
 }
+
+func TestRemoveBridge(t *testing.T) {
+	// TODO
+}

@@ -13,31 +13,30 @@ func newRouter() *mux.Router {
 	r := mux.NewRouter()
 
 	// Declare the static file directory and point it to the directory we just made
-	staticFileDirectory := http.Dir("./assets/")
+	staticFileDirectory := http.Dir("./assets/connect/")
 	// Declare the handler, that routes requests to their respective filename.
 	// The fileserver is wrapped in the `stripPrefix` method, because we want to
-	// remove the "/assets/" prefix when looking for files.
-	// For example, if we type "/assets/index.html" in our browser, the file server
-	// will look for only "index.html" inside the directory declared above.
-	// If we did not strip the prefix, the file server would look for "./assets/assets/index.html", and yield an error
+	// remove the "/connect/" prefix when looking for files.
+	// For example, if we type "/connect/index.html" in our browser, the file server
+	// will look for only "index.html" inside the directory declared above (/assets/connect/).
+	// If we did not strip the prefix, the file server would look for "./assets/connect/connect/index.html",
+	// and yield an error
 	staticFileHandler := http.StripPrefix("/connect/", http.FileServer(staticFileDirectory))
-	// The "PathPrefix" method acts as a matcher, and matches all routes starting
-	// with "/assets/", instead of the absolute route itself
-	r.PathPrefix("/connect/").Handler(staticFileHandler).Methods("GET")
+	// We use a subrouter to take care of the path under /connect
+	rConnectAssets := r.PathPrefix("/connect").Subrouter()
+	// "/" matches "/connect/" thanks to our subrouter. Any GET request in this path
+	// will route to our file server declared above
+	rConnectAssets.PathPrefix("/").Handler(staticFileHandler).Methods("GET")
 
-	//
-	// TODO : put the connection steps in "assets/connection/" and make a subrouter to handle them
-	// // Subrouter for path under "/connect"
-	// connectRouter := r.PathPrefix("/connect").Subrouter()
-	// connectRouter.HandleFunc("/step1", step1Handler)
-	//
-
-	r.HandleFunc("/bridges", getBridges).Methods("GET")
-	r.HandleFunc("/step1", getStep1).Methods("GET")
-	r.HandleFunc("/step1", postStep1).Methods("POST")
-	r.HandleFunc("/step2", getStep2).Methods("GET")
-	r.HandleFunc("/step2", postStep2).Methods("POST")
-	r.HandleFunc("/step3", getStep3).Methods("GET")
+	// We need another subrouter who will this time route to methodes and not files
+	rConnectAPI := r.PathPrefix("/api/connect").Subrouter()
+	rConnectAPI.HandleFunc("/bridges", getBridges).Methods("GET")
+	rConnectAPI.HandleFunc("/remove/{username}", removeBridge).Methods("GET")
+	rConnectAPI.HandleFunc("/step1", getStep1).Methods("GET")
+	rConnectAPI.HandleFunc("/step1", postStep1).Methods("POST")
+	rConnectAPI.HandleFunc("/step2", getStep2).Methods("GET")
+	rConnectAPI.HandleFunc("/step2", postStep2).Methods("POST")
+	rConnectAPI.HandleFunc("/step3", getStep3).Methods("GET")
 	return r
 }
 

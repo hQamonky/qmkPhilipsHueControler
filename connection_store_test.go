@@ -67,7 +67,7 @@ func (s *StoreSuite) TestCreateBridge() {
 	})
 
 	// Query the database for the entry we just created
-	res, err := s.db.Query(`SELECT COUNT(*) FROM tb_hue_bridges WHERE id='test ID' AND internalipaddress='test IP Address' AND username=''`)
+	res, err := s.db.Query(`SELECT COUNT(*) FROM tb_hue_bridges WHERE id='test ID' AND internalipaddress='test IP Address' AND username='test Username'`)
 	if err != nil {
 		s.T().Fatal(err)
 	}

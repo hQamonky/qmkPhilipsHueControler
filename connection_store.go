@@ -9,11 +9,11 @@ import (
 // Store will have two methods, to add a new hue bridge,
 // and to get all existing bridges
 // Each method returns an error, in case something goes wrong
-// TODO : Add other methods for deleting a bridge, and
-// getting a bridge by id or by username
+// TODO : Add a method for getting a bridge by username
 type Store interface {
 	CreateBridge(bridge *Bridge) error
 	GetBridges() ([]*Bridge, error)
+	DeleteBridge(username string) error
 }
 
 // The `dbStore` struct will implement the `Store` interface
@@ -58,6 +58,15 @@ func (store *dbStore) GetBridges() ([]*Bridge, error) {
 		bridges = append(bridges, bridge)
 	}
 	return bridges, nil
+}
+
+func (store *dbStore) DeleteBridge(username string) error {
+	// The first underscore means that we don't care about what's returned from
+	// this insert query. We just want to know if it was inserted correctly,
+	// and the error will be populated if it wasn't
+	fmt.Println("Using DeleteBridge :", username)
+	_, err := store.db.Query("DELETE FROM tb_hue_bridges WHERE username = $1", username)
+	return err
 }
 
 // The store variable is a package level variable that will be available for

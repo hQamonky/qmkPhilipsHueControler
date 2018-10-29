@@ -9,6 +9,15 @@ type MockStore struct {
 	mock.Mock
 }
 
+var mockBridge = Bridge{
+	ID:                "mockBridgeID",
+	InternalIPAddress: "mockBridgeIP",
+	Username:          "mockBridgeUsername",
+}
+var mockBridges = [1]Bridge{
+	mockBridge,
+}
+
 // CreateBridge is
 func (m *MockStore) CreateBridge(bridge *Bridge) error {
 	/*
@@ -28,6 +37,17 @@ func (m *MockStore) GetBridges() ([]*Bridge, error) {
 		we need to typecast it to the type we expect, which in this case is []*Bridge
 	*/
 	return rets.Get(0).([]*Bridge), rets.Error(1)
+}
+
+// DeleteBridge is
+func (m *MockStore) DeleteBridge(username string) error {
+	/*
+		When this method is called, `m.Called` records the call, and also
+		returns the result that we pass to it (which you will see in the
+		handler tests)
+	*/
+	rets := m.Called(mockBridge.Username)
+	return rets.Error(0)
 }
 
 // InitMockStore is

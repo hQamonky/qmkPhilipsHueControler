@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+ <title>QMK Philips Hue Controler</title>
+</head>
+
+<body>
+  <h1>Step 3 - Success</h1>
+  <p>
+    Hue Bridge has successfully been added !
+  </p>
+  <p id="bridgeInfo">
+  </p>
+  <p>[<a href="/connect/">Done</a>]</p>
+
+  <!-- The script that will run to fetch the list of bridges and add them to our existing table -->
+  <script>
+      bridgeInfo = document.getElementById("bridgeInfo")
+      // Use the browsers `fetch` API to make a GET call to /step1
+      fetch("/api/connect/step3")
+        .then(response => response.json())
+        .then(chosenBridge => {
+          bridgeInfo.innerHTML = "Selected Hue Bridge :<br/>" +
+          "ID : " + chosenBridge.id + "<br/>" + 
+          "IP : " + chosenBridge.internalipaddress + "<br/>" + 
+          "Username : " + chosenBridge.username
+        })
+    </script>
+</body>
